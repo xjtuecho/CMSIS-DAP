@@ -125,9 +125,13 @@
 /*!< Uncomment the following line if you need to relocate your vector Table in
      Internal SRAM. */
 /* #define VECT_TAB_SRAM */
-#define VECT_TAB_OFFSET  0x0 /*!< Vector Table base offset field.
-                                  This value must be a multiple of 0x200. */
-
+#if defined (UIDISK_V1)
+/*!< Set IROM1 start address to 0x08008000 */
+#define VECT_TAB_OFFSET  0x8000
+#else
+/*!< Vector Table base offset field. This value must be a multiple of 0x200. */
+#define VECT_TAB_OFFSET  0x0
+#endif
 
 /**
   * @}

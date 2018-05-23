@@ -46,13 +46,22 @@ uint32_t led_timeout;
   * @brief	LED functions
   *
   */
-void LedConnectedOn(void)		{	LED_CONNECTED_PORT->BSRR = LED_CONNECTED;	}
-void LedConnectedOff(void)		{	LED_CONNECTED_PORT->BRR  = LED_CONNECTED;	}
-void LedConnectedToggle(void)	{	LED_CONNECTED_PORT->ODR ^= LED_CONNECTED;	}
+#if defined( BOARD_V3 )
+// active Low
+void LedConnectedOn(void) {LED_CONNECTED_PORT->BRR = LED_CONNECTED;}
+void LedConnectedOff(void) {LED_CONNECTED_PORT->BSRR  = LED_CONNECTED;}
+void LedRunningOn(void) {LED_RUNNING_PORT->BRR =LED_RUNNING;}
+void LedRunningOff(void) {LED_RUNNING_PORT->BSRR =LED_RUNNING;}
+#else
+// active High
+void LedConnectedOn(void) {LED_CONNECTED_PORT->BSRR = LED_CONNECTED;}
+void LedConnectedOff(void) {LED_CONNECTED_PORT->BRR = LED_CONNECTED;}
+void LedRunningOn(void) {LED_RUNNING_PORT->BSRR = LED_RUNNING;}
+void LedRunningOff(void) {LED_RUNNING_PORT->BRR = LED_RUNNING;}
+#endif
 
-void LedRunningOn(void)			{	LED_RUNNING_PORT->BSRR   = LED_RUNNING;		}
-void LedRunningOff(void)		{	LED_RUNNING_PORT->BRR    = LED_RUNNING;		}
-void LedRunningToggle(void)		{	LED_RUNNING_PORT->ODR   ^= LED_RUNNING;		}
+void LedConnectedToggle(void) {LED_CONNECTED_PORT->ODR ^= LED_CONNECTED;}
+void LedRunningToggle(void) {LED_RUNNING_PORT->ODR ^= LED_RUNNING;}
 
 void LEDS_SETUP (void)
 {
@@ -67,13 +76,11 @@ void LEDS_SETUP (void)
 		GPIO_Mode_Out_PP
 	};
 
-	RCC->APB2ENR |= LED_CONNECTED_RCC;
-
 	GPIO_INIT(LED_CONNECTED_PORT, LED_CONNECTED_INIT);
-	LED_CONNECTED_PORT->BRR = LED_CONNECTED;
+	LedConnectedOff();
 
 	GPIO_INIT(LED_RUNNING_PORT, LED_RUNNING_INIT);
-	LED_RUNNING_PORT->BRR = LED_RUNNING;
+	LedRunningOff();
 }
 
 void LedConnectedOut(uint16_t bit)
@@ -270,9 +277,8 @@ void PORT_USB_CONNECT_SETUP(void)
 		PIN_USB_MODE
 	};
 
-	RCC->APB2ENR |= PIN_USB_CONNECT_RCC;
 	GPIO_INIT(PIN_USB_CONNECT_PORT, INIT_PIN_USB_CONNECT);
-	PIN_USB_CONNECT_OFF();
+	PIN_USB_CONNECT_ON();
 #endif
 }
 
@@ -506,13 +512,19 @@ void BoardInit(void)
 	// Enable GPIOA-GPIOC
 	RCC->APB2ENR |= (RCC_APB2ENR_AFIOEN | RCC_APB2ENR_IOPAEN | RCC_APB2ENR_IOPBEN | RCC_APB2ENR_IOPCEN);
 
+#if defined (UIDISK_V1)
+	// Full SWJ Disabled
+	GPIO_PinRemapConfig(GPIO_Remap_SWJ_Disable, ENABLE);
+#else
 	// Enable SWJ only
 	GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);
+#endif
 
 	GPIO_INIT(GPIOA, INIT_PINS_A);
 	GPIO_INIT(GPIOB, INIT_PINS_B);
 	GPIO_INIT(GPIOC, INIT_PINS_C);
 
+	PORT_USB_CONNECT_SETUP();
 	LEDS_SETUP();
 }
 

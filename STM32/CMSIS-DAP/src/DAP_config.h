@@ -45,6 +45,7 @@ typedef const struct
 #if !defined ( BOARD_V1      )	\
  && !defined ( BOARD_V2      )	\
  && !defined ( BOARD_V3      )  \
+ && !defined ( UIDISK_V1     )  \
  && !defined ( STLINK_V20    )	\
  && !defined ( STLINK_V21    )	\
  && !defined ( BOARD_STM32RF )
@@ -113,6 +114,7 @@ Provides definitions about:
 /// This information is returned by the command \ref DAP_Info as part of <b>Capabilities</b>.
 #if defined ( BOARD_STM32RF )	\
  || defined ( BOARD_V3 )        \
+ || defined ( UIDISK_V1 ) 	    \
  || defined ( STLINK_V20 )		\
  || defined ( STLINK_V21 )
 	#define DAP_JTAG			0				///< JTAG Mode: 1 = available, 0 = not available.
@@ -203,6 +205,20 @@ typedef enum Pin_e {
 	#define USART_IRQHandler	USART1_IRQHandler
 	#define USART_BUFFER_SIZE	(256)	/*	Size of Receive and Transmit buffers MUST BE 2^n */
 
+#elif  defined(UIDISK_V1)
+
+#define USART_CLOCK(state)		RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, state)
+#define USART_GPIO_CLOCK(state) RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, state)
+#define USART_REMAP()			GPIO_PinRemapConfig(GPIO_Remap_USART1, ENABLE)
+
+#define USART_PORT			USART1
+#define USART_GPIO			GPIOB
+#define USART_TX_PIN		GPIO_Pin_6
+#define USART_RX_PIN		GPIO_Pin_7
+#define USART_IRQn			USART1_IRQn
+#define USART_IRQHandler	USART1_IRQHandler
+#define USART_BUFFER_SIZE	(256)	/*	Size of Receive and Transmit buffers MUST BE 2^n */
+
 #elif defined ( STLINK_V20 )	\
   ||  defined ( STLINK_V21 )
 
@@ -233,6 +249,16 @@ typedef enum Pin_e {
 	#define PIN_USB_CONNECT_PORT	GPIOA
 	#define PIN_USB_CONNECT_PIN		8
 	#define PIN_USB_CONNECT			PIN_MASK(PIN_USB_CONNECT_PIN)
+	#define PIN_USB_MODE			GPIO_Mode_Out_PP
+	#define PIN_USB_CONNECT_ON()	PIN_USB_CONNECT_PORT->BSRR = PIN_USB_CONNECT
+	#define PIN_USB_CONNECT_OFF()	PIN_USB_CONNECT_PORT->BRR  = PIN_USB_CONNECT
+
+#elif defined ( UIDISK_V1 )
+
+	#define PIN_USB_CONNECT_RCC 	RCC_APB2ENR_IOPAEN
+	#define PIN_USB_CONNECT_PORT	GPIOA
+	#define PIN_USB_CONNECT_PIN 	1
+	#define PIN_USB_CONNECT 		PIN_MASK(PIN_USB_CONNECT_PIN)
 	#define PIN_USB_MODE			GPIO_Mode_Out_PP
 	#define PIN_USB_CONNECT_ON()	PIN_USB_CONNECT_PORT->BSRR = PIN_USB_CONNECT
 	#define PIN_USB_CONNECT_OFF()	PIN_USB_CONNECT_PORT->BRR  = PIN_USB_CONNECT
@@ -331,6 +357,28 @@ typedef enum Pin_e {
 	#define PIN_nRESET_PORT			GPIOB
 	#define PIN_nRESET_PIN			7
 
+#elif defined ( UIDISK_V1 )
+
+	// SWDIO/TMS Pin
+	#define PIN_SWDIO_TMS_PORT		GPIOA
+	#define PIN_SWDIO_TMS_PIN		10
+
+	// SWCLK/TCK Pin
+	#define PIN_SWCLK_TCK_PORT		GPIOA
+	#define PIN_SWCLK_TCK_PIN		9
+
+	// TDO/SWO Pin (input)
+	#define PIN_TDO_PORT			GPIOB
+	#define PIN_TDO_PIN				10
+
+	// TDI Pin (output)
+	#define PIN_TDI_PORT			GPIOB
+	#define PIN_TDI_PIN				11
+
+	// nRESET Pin
+	#define PIN_nRESET_PORT			GPIOA
+	#define PIN_nRESET_PIN			13
+
 #elif defined ( STLINK_V20 ) || defined ( STLINK_V21 )
 
 	// SWDIO/TMS Pin
@@ -394,6 +442,18 @@ typedef enum Pin_e {
 	// Target Running LED (RED)
 	#define LED_RUNNING_PORT		GPIOC
 	#define LED_RUNNING_PIN			13
+
+#elif defined ( UIDISK_V1 )
+
+	#define LED_CONNECTED_RCC		RCC_APB2ENR_IOPBEN
+
+		// Connected LED (GREEN)
+	#define LED_CONNECTED_PORT		GPIOB
+	#define LED_CONNECTED_PIN		13
+
+		// Target Running LED (RED)
+	#define LED_RUNNING_PORT		GPIOB
+	#define LED_RUNNING_PIN			12
 
 #elif defined ( STLINK_V20 )
 

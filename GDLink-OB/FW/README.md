@@ -1,7 +1,8 @@
 # GDLink-OB firmware
 
-## Firmware Description
+目前固件分2个版本：
 
-- `USBD_DAP_v*.hex`: CMSIS_DAP firmware, factory default firmware.
-- `USBD_MSC_v*.hex`: Mass Storage firmware, a 20kB USB Disk, just for fun.
-- `USBD_UART_v*.hex`: USB to UART firmware, `T` is TXD, `R` is RXD, baudrate up to 115200 works well.
+- 热缩管塑封的为GDLink-S
+- 带外壳的为GDLink-Lite
+
+两者固件不兼容，不能通刷，如果您的设备使用正常，不建议刷固件。

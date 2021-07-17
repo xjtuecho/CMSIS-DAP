@@ -1,6 +1,6 @@
 #!/bin/sh
 
-TARGET="gd32f130f8"
+TARGET="gd32f150c8"
 PACK_NAME="$PACKS/GigaDevice.GD32F1x0_DFP.3.1.1.pack"
 
 Usage() {

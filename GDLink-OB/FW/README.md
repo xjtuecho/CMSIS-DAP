@@ -25,6 +25,7 @@ JTAG时，TDO连接目标板容易导致误进入引导程序，可以USB上电�
 
 - 使能JTAG功能，实测使用JTAG可以连接烧录RISC-V内核的GD32VF103。
 - XBOOT_USB将引导选择管脚改为TRESET，防止使用JTAG时TDO被拉低导致进入XBOOT_USB。
+- 从该版本开始同时提供8M和12M晶振固件，2022/6/25以后出货的GDLink-Lite硬件为12M晶振。
 
 ## v21.5.20
 
